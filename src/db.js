@@ -11,7 +11,7 @@ const pool = new Pool({
 });
 
 // Test connection with retry logic
-const connectWithRetry = async (retries = 5, delay = 5000) => {
+const connectWithRetry = async (retries = 12, delay = 10000) => {
   for (let i = 0; i < retries; i++) {
     try {
       const client = await pool.connect();
