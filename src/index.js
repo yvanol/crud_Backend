@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://crud-frontend-pwnwir1ym-rikam-yvanol-giovanis-projects.vercel.app, // Replace with your Vercel URL
+    'https://crud-frontend-pwnwir1ym-rikam-yvanol-giovanis-projects.vercel.app'
   ],
   credentials: true,
 }));
