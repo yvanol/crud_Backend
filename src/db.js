@@ -10,19 +10,30 @@ const pool = new Pool({
   },
 });
 
-// Test connection on startup
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('Database connection error:', {
-      message: err.message,
-      code: err.code,
-      detail: err.detail,
-    });
-    return;
+// Test connection with retry logic
+const connectWithRetry = async (retries = 5, delay = 5000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const client = await pool.connect();
+      console.log('Connected to PostgreSQL database');
+      client.release();
+      return;
+    } catch (err) {
+      console.error(`Database connection attempt ${i + 1} failed:`, {
+        message: err.message,
+        code: err.code,
+        detail: err.detail,
+      });
+      if (i < retries - 1) {
+        console.log(`Retrying in ${delay / 1000} seconds...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
   }
-  console.log('Connected to PostgreSQL database');
-  release();
-});
+  console.error('Failed to connect to database after retries');
+};
+
+connectWithRetry();
 
 export const query = async (text, params) => {
   try {
