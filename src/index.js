@@ -7,9 +7,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: [
+  origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [
     'http://localhost:5173',
-    'https://crud-frontend-pwnwir1ym-rikam-yvanol-giovanis-projects.vercel.app'
+    'https://crud-frontend-pwnwir1ym-rikam-yvanol-giovanis-projects.vercel.app',
   ],
   credentials: true,
 }));

@@ -1,57 +1,57 @@
-import { query } from '../db.js';
+import * as productService from '../services/productService.js';
 
 export const getProducts = async (req, res) => {
   try {
-    const result = await query('SELECT * FROM product_tb WHERE isactive = $1', [true]);
-    res.status(200).json(result.rows);
+    const products = await productService.getProducts();
+    res.status(200).json(products);
   } catch (err) {
     console.error('Error fetching products:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 };
 
 export const createProduct = async (req, res) => {
-  const { name, price, description, isactive } = req.body;
   try {
-    const result = await query(
-      'INSERT INTO product_tb (name, price, description, isactive) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, price, description, isactive]
-    );
-    res.status(201).json(result.rows[0]);
+    const { name, price, description, isactive } = req.body;
+    if (!name || !price || !description) {
+      return res.status(400).json({ error: 'Name, price, and description are required' });
+    }
+    const product = await productService.createProducts({ name, price, description, isactive });
+    res.status(201).json(product);
   } catch (err) {
     console.error('Error creating product:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 };
 
 export const updateProduct = async (req, res) => {
-  const { id } = req.params;
-  const { name, price, description, isactive } = req.body;
   try {
-    const result = await query(
-      'UPDATE product_tb SET name = $1, price = $2, description = $3, isactive = $4 WHERE id = $5 RETURNING *',
-      [name, price, description, isactive, id]
-    );
-    if (result.rowCount === 0) {
+    const { id } = req.params;
+    const { name, price, description, isactive } = req.body;
+    if (!name || !price || !description) {
+      return res.status(400).json({ error: 'Name, price, and description are required' });
+    }
+    const product = await productService.updateProduct(id, { name, price, description, isactive });
+    if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(product);
   } catch (err) {
     console.error('Error updating product:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 };
 
 export const deleteProduct = async (req, res) => {
-  const { id } = req.params;
   try {
-    const result = await query('DELETE FROM product_tb WHERE id = $1 RETURNING *', [id]);
-    if (result.rowCount === 0) {
+    const { id } = req.params;
+    const success = await productService.deleteProduct(id);
+    if (!success) {
       return res.status(404).json({ error: 'Product not found' });
     }
     res.status(200).json({ message: 'Product deleted' });
   } catch (err) {
     console.error('Error deleting product:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 };

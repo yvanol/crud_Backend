@@ -1,4 +1,5 @@
 import { authenticateAdmin, createAdmin } from '../services/authService.js';
+import jwt from 'jsonwebtoken';
 
 export const login = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ export const login = async (req, res) => {
     if (!admin) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    const token = `admin-${admin.id}`; // Mock token matching productRoute.js
+    const token = jwt.sign({ id: admin.id, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).json({ message: 'Login successful', token });
   } catch (err) {
     console.error('Error during login:', { message: err.message, stack: err.stack });
