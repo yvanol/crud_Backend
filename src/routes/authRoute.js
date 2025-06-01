@@ -1,9 +1,11 @@
-import express from 'express';
-import * as authController from '../controllers/authController.js';
+import { Router } from 'express';
+   import { getProducts, createProduct, updateProduct, deleteProduct } from '../controllers/productController.js';
 
-const router = express.Router();
+   const router = Router();
 
-router.post('/login', authController.login);
-router.post('/register', authController.register);
+   router.get('/products', getProducts);
+   router.post('/products', createProduct);
+   router.put('/products/:id', updateProduct);
+   router.delete('/products/:id', deleteProduct);
 
-export default router;
+   export default router;
