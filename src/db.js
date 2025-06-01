@@ -10,4 +10,12 @@ const pool = new Pool({
   },
 });
 
-export default pool;
+export const query = async (text, params) => {
+  try {
+    const res = await pool.query(text, params);
+    return res;
+  } catch (err) {
+    console.error('Database query error:', err);
+    throw err;
+  }
+};
